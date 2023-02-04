@@ -2,155 +2,158 @@ var form = document.getElementById("addForm");
 var itemList = document.getElementById("items");
 var filter = document.getElementById("filter");
 var body = document.getElementsByTagName("body");
-//localStorage.setItem('key',0)
 
-// Form submit event
+
+
 form.addEventListener("submit", addItem);
-// Delete event
+
 itemList.addEventListener("click", removeItem);
-// Filter event
 filter.addEventListener("keyup", filterItems);
 window.addEventListener("load", showI);
-// Add item
 function showI(e) {
   e.preventDefault();
 
-  for (i in localStorage) {
-    if (localStorage.getItem(i) != null) {
-      //console.log(localStorage.getItem(i));
-      var li = document.createElement("li");
-      var deleteBtn = document.createElement("button");
-      deleteBtn.className = "btn btn-danger btn-sm float-right delete";
-
-      // Append text node
-      deleteBtn.appendChild(document.createTextNode("Delete"));
-      var editBtn = document.createElement("button");
-
-      // Add classes to del button
-      editBtn.className = "btn btn-danger btn-sm float-right edit";
-
-      // Append text node
-      editBtn.appendChild(document.createTextNode("Edit"));
-
-      // Append button to li
-
-      li.className = "list-group-item";
-
-      li.innerText = localStorage.getItem(i);
-      li.appendChild(deleteBtn);
-      li.appendChild(editBtn);
-
-      itemList.appendChild(li);
-    }
-  }
+  axios
+    .get("https://crudcrud.com/api/07a778cdec63468ab830fb764f9cff94/addUser")
+    .then((res) => showOutput(res.data))
+    .catch((err) => console.log(err));
 }
 
-// Add item
+function showOutput(res) {
+  for (i in res) {
+    var sp = document.createElement("span");
+    sp.style.display = "none";
+    sp.innerText = JSON.stringify(res[i]._id);
+    var li = document.createElement("li");
+    var deleteBtn = document.createElement("button");
+    deleteBtn.className = "btn btn-danger btn-sm float-right delete";
+
+    deleteBtn.appendChild(document.createTextNode("Delete"));
+    var editBtn = document.createElement("button");
+
+    editBtn.className = "btn btn-danger btn-sm float-right edit";
+
+    editBtn.appendChild(document.createTextNode("Edit"));
+
+
+    li.className = "list-group-item";
+
+    li.innerHTML = ` ${res[i].expenseAmount} &nbsp &nbsp  ${res[i].description}&nbsp &nbsp  ${res[i].category}`;
+    li.appendChild(deleteBtn);
+    li.appendChild(sp);
+    li.appendChild(editBtn);
+
+    itemList.appendChild(li);
+  }
+}
 function addItem(e) {
   e.preventDefault();
 
-  // Get input value
-  var newItemr = document.getElementById("itemr").value;
-  var newItem = document.getElementById("item").value;
-  var newItem2 = document.getElementById("item2").value;
+  var newItem1 = e.target.expenseAmount.value;
+  var newItem2 = e.target.description.value;
+  var newItem3 = e.target.category.value;
 
-  // Create new li element
   var li = document.createElement("li");
-  // Add class
   li.className = "list-group-item";
-  // Add text node with input value
-  li.appendChild(document.createTextNode(newItemr));
+  li.appendChild(document.createTextNode(newItem1));
   li.appendChild(document.createTextNode(" "));
-  li.appendChild(document.createTextNode(newItem));
   li.appendChild(document.createTextNode(" "));
   li.appendChild(document.createTextNode(newItem2));
+  li.appendChild(document.createTextNode(" "));
+  li.appendChild(document.createTextNode(" "));
+  li.appendChild(document.createTextNode(newItem3));
 
-  // Create del button element
   var deleteBtn = document.createElement("button");
 
-  // Add classes to del button
   deleteBtn.className = "btn btn-danger btn-sm float-right delete";
 
-  // Append text node
   deleteBtn.appendChild(document.createTextNode("Delete"));
 
-  // Append button to li
   li.appendChild(deleteBtn);
-  // Append li to list
   var editBtn = document.createElement("button");
 
-  // Add classes to del button
   editBtn.className = "btn btn-danger btn-sm float-right edit";
 
-  // Append text node
   editBtn.appendChild(document.createTextNode("Edit"));
 
-  // Append button to li
 
   li.appendChild(editBtn);
 
   axios
-    .post("https://crudcrud.com/api/e37d4d83ad6942c9bb2167bdaa96093e/addUser", {
-      user: li.innerText,
+    .post("https://crudcrud.com/api/07a778cdec63468ab830fb764f9cff94/addUser", {
+      expenseAmount: newItem1,
+      description: newItem2,
+      category: newItem3,
     })
     .then((r) => {
       console.log(r);
-    }).catch(e=>console.log(e));
-    
+      location.reload();
+    })
+    .catch((e) => console.log(e));
 
-  localStorage.setItem(newItemr, li.innerText);
   itemList.appendChild(li);
 }
 
-// Remove item
 function removeItem(e) {
   if (e.target.classList.contains("edit")) {
     var li = e.target.parentElement;
-    let arr = li.innerText;
-    let k = "";
-    let f = "";
-    let s = "";
-    let count = 0;
-    for (i = 0; i < li.innerText.length; i++) {
-      // console.log(arr[i])
-      if (arr[i] == " ") count++;
-      if (count < 1) k = k + arr[i];
-      else if (count == 1) f = f + arr[i];
-      else s = s + arr[i];
-    }
-    itemList.removeChild(li);
-    localStorage.removeItem(k);
-    document.getElementById("itemr").value = k;
-    document.getElementById("item").value = f;
-    document.getElementById("item2").value = s;
+    var sp = e.target.previousSibling;
+    let k = JSON.parse(sp.innerHTML);
+    var E = "";
+    var D = "";
+    var C = "";
+    axios
+      .get(
+        `https://crudcrud.com/api/07a778cdec63468ab830fb764f9cff94/addUser/${k}`
+      )
+      .then((res) => {
+        console.log(res.data);
+        E = JSON.stringify(res.data.expenseAmount);
+        D = JSON.stringify(res.data.description);
+        C = JSON.stringify(res.data.category);
+        itemList.removeChild(li);
+        console.log(1);
+        console.log(E);
+        console.log(D);
+        console.log(C);
+        document.getElementById("item1").value = E;
+        document.getElementById("item2").value = D;
+        document.getElementById("item3").value = C;
+        axios
+          .delete(
+            `https://crudcrud.com/api/07a778cdec63468ab830fb764f9cff94/addUser/${k}`
+          )
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
 
-    //   console.log(k)
-  }
-  if (e.target.classList.contains("delete")) {
+  } if (e.target.classList.contains("delete")) {
     if (confirm("Are You Sure?")) {
       var li = e.target.parentElement;
-      console.log(li.innerText.length);
-      let arr = li.innerText;
-      let k = "";
-      for (i = 0; i < li.innerText.length; i++) {
-        // console.log(arr[i])
-        if (arr[i] == " ") break;
-        k = k + arr[i];
-      }
-      //   console.log(k)
+      var sp = e.target.nextSibling;
+
+      console.log(1)
+      console.log(sp.innerHTML)
+
+      let k = JSON.parse(sp.innerHTML);
+      console.log(k)
+
+      axios
+        .delete(
+          `https://crudcrud.com/api/07a778cdec63468ab830fb764f9cff94/addUser/${k}`
+        )
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
+
       itemList.removeChild(li);
-      localStorage.removeItem(k);
     }
   }
 }
 
-// Filter Items
 function filterItems(e) {
-  // convert text to lowercase
   var text = e.target.value.toLowerCase();
-  // Get lis
   var items = itemList.getElementsByTagName("li");
-  // Convert to an array
   Array.from(items).forEach(function (item) {
     var itemName = item.firstChild.textContent;
     if (itemName.toLowerCase().indexOf(text) != -1) {
