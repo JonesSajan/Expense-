@@ -10,13 +10,23 @@ form.addEventListener("submit", addItem);
 itemList.addEventListener("click", removeItem);
 filter.addEventListener("keyup", filterItems);
 window.addEventListener("load", showI);
-function showI(e) {
-  e.preventDefault();
 
-  axios
-    .get("https://crudcrud.com/api/07a778cdec63468ab830fb764f9cff94/addUser")
-    .then((res) => showOutput(res.data))
-    .catch((err) => console.log(err));
+
+
+
+
+
+async function showI(e) {
+  e.preventDefault();
+  try{
+
+
+    const response = await axios.get("https://crudcrud.com/api/1bfb143ff89d403f8c70c79fb39f426f/addUser")
+    console.log(response.data);
+    showOutput(response.data);
+  }catch (error) {
+    console.error(error);
+  }
 }
 
 function showOutput(res) {
@@ -53,34 +63,9 @@ function addItem(e) {
   var newItem2 = e.target.description.value;
   var newItem3 = e.target.category.value;
 
-  var li = document.createElement("li");
-  li.className = "list-group-item";
-  li.appendChild(document.createTextNode(newItem1));
-  li.appendChild(document.createTextNode(" "));
-  li.appendChild(document.createTextNode(" "));
-  li.appendChild(document.createTextNode(newItem2));
-  li.appendChild(document.createTextNode(" "));
-  li.appendChild(document.createTextNode(" "));
-  li.appendChild(document.createTextNode(newItem3));
-
-  var deleteBtn = document.createElement("button");
-
-  deleteBtn.className = "btn btn-danger btn-sm float-right delete";
-
-  deleteBtn.appendChild(document.createTextNode("Delete"));
-
-  li.appendChild(deleteBtn);
-  var editBtn = document.createElement("button");
-
-  editBtn.className = "btn btn-danger btn-sm float-right edit";
-
-  editBtn.appendChild(document.createTextNode("Edit"));
-
-
-  li.appendChild(editBtn);
 
   axios
-    .post("https://crudcrud.com/api/07a778cdec63468ab830fb764f9cff94/addUser", {
+    .post("https://crudcrud.com/api/1bfb143ff89d403f8c70c79fb39f426f/addUser", {
       expenseAmount: newItem1,
       description: newItem2,
       category: newItem3,
@@ -91,10 +76,10 @@ function addItem(e) {
     })
     .catch((e) => console.log(e));
 
-  itemList.appendChild(li);
 }
 
-function removeItem(e) {
+async function removeItem(e) { 
+  try{
   if (e.target.classList.contains("edit")) {
     var li = e.target.parentElement;
     var sp = e.target.previousSibling;
@@ -104,13 +89,13 @@ function removeItem(e) {
     var C = "";
     axios
       .get(
-        `https://crudcrud.com/api/07a778cdec63468ab830fb764f9cff94/addUser/${k}`
+        `https://crudcrud.com/api/1bfb143ff89d403f8c70c79fb39f426f/addUser/${k}`
       )
       .then((res) => {
         console.log(res.data);
-        E = JSON.stringify(res.data.expenseAmount);
-        D = JSON.stringify(res.data.description);
-        C = JSON.stringify(res.data.category);
+        E = res.data.expenseAmount;
+        D = res.data.description;
+        C = res.data.category;
         itemList.removeChild(li);
         console.log(1);
         console.log(E);
@@ -121,7 +106,7 @@ function removeItem(e) {
         document.getElementById("item3").value = C;
         axios
           .delete(
-            `https://crudcrud.com/api/07a778cdec63468ab830fb764f9cff94/addUser/${k}`
+            `https://crudcrud.com/api/1bfb143ff89d403f8c70c79fb39f426f/addUser/${k}`
           )
           .then((res) => console.log(res))
           .catch((err) => console.log(err));
@@ -141,7 +126,7 @@ function removeItem(e) {
 
       axios
         .delete(
-          `https://crudcrud.com/api/07a778cdec63468ab830fb764f9cff94/addUser/${k}`
+          `https://crudcrud.com/api/1bfb143ff89d403f8c70c79fb39f426f/addUser/${k}`
         )
         .then((res) => console.log(res))
         .catch((err) => console.log(err));
@@ -149,6 +134,9 @@ function removeItem(e) {
       itemList.removeChild(li);
     }
   }
+}catch (error) {
+  console.error(error);
+}
 }
 
 function filterItems(e) {
