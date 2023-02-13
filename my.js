@@ -55,9 +55,9 @@ var body = document.getElementsByTagName("body");
 form.addEventListener("submit", addItem);
 
 async function addItem(e) {
-  try {
-    e.preventDefault();
-
+  e.preventDefault();
+  
+  try { 
     var newItem1 = e.target.name.value;
     var newItem2 = e.target.email.value;
     var newItem3 = e.target.password.value;
@@ -73,11 +73,16 @@ async function addItem(e) {
       "http://localhost:3000/user/adduser",
       data
     );
-    console.log(response);
+    console.log(response.data);
+    if(response.data=="unique violation")
+    {document.getElementById('message').innerHTML='<p style="color:red">Email Id already exist</p>'}
+    else{
+      document.getElementById('message').innerHTML='<p style="color:green">Account Created Successfully</p>'
     // location.reload();
     document.getElementById("item1").value = "";
     document.getElementById("item2").value = "";
     document.getElementById("item3").value = "";
+    }
     // var li = document.createElement("li");
     // li.className = "list-group-item";
     // li.appendChild(document.createTextNode(newItem1));
