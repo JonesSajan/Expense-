@@ -21,6 +21,9 @@ async function login(e) {
 
     document.getElementById('message').innerText=response.data;
 
+    location.href = 'home.html';
+
+
     document.getElementById("item1").value = "";
     document.getElementById("item2").value = "";
 
