@@ -17,11 +17,13 @@ async function login(e) {
       "http://localhost:3000/user/loginuser",
       data
     );
-    console.log(response.data);
+    console.log(response.data.token);
 
-    document.getElementById('message').innerText=response.data;
+    document.getElementById('message').innerText=response.data.msg;
 
-    location.href = 'home.html';
+     localStorage.setItem('token',response.data.token)
+
+     location.href = 'home.html';
 
 
     document.getElementById("item1").value = "";
@@ -29,8 +31,11 @@ async function login(e) {
 
 
   } catch (error) {
+    console.error("catch block called");    
     console.error(error);    
-    document.getElementById('message').innerText=error;
+    // document.getElementById('message').innerText=error;
+    // document.getElementById('message').innerText=error.message;
+
 
   }
 }

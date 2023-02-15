@@ -14,7 +14,7 @@ async function showI(e) {
   try {
     e.preventDefault();
 
-    const response = await axios.get("http://localhost:3000/expense/expenses");
+    const response = await axios.get("http://localhost:3000/expense/expenses",{headers:{'Authorization':localStorage.getItem('token')}});
     console.log(response.data);
     showOutput(response.data);
   } catch (error) {
@@ -67,6 +67,7 @@ async function addItem(e) {
       expense_amount: newItem1,
       description: newItem2,
       category: newItem3,
+      id:localStorage.getItem('token')
     };
 
     console.log(typeof data);
