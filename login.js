@@ -17,11 +17,12 @@ async function login(e) {
       "http://localhost:3000/user/loginuser",
       data
     );
-    console.log(response.data.token);
+    console.log(response.data.premium);
 
     document.getElementById('message').innerText=response.data.msg;
 
      localStorage.setItem('token',response.data.token)
+     await localStorage.setItem('premium',response.data.premium)
 
      if(response){location.href = 'home.html';}
 

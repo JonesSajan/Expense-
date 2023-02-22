@@ -27,6 +27,7 @@ async function showI(e) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function showOutput(res) {
   try {
+    localStorage.getItem('premium')?document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p>':'    <button id="buy-premium" class="btn btn-dark" style="width: 20rem;margin-bottom: 2rem;">Buy Premium</button>'
     for (i in res) {
       var sp = document.createElement("span");
       sp.style.display = "none";
@@ -222,6 +223,8 @@ async function buyPremium(e) {
           { headers: { Authorization: localStorage.getItem("token") } }
         );
         alert("you are a premium user");
+        document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p>'
+
       },
     };
 
