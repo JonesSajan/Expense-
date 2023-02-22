@@ -23,7 +23,7 @@ async function login(e) {
 
      localStorage.setItem('token',response.data.token)
 
-     location.href = 'home.html';
+     if(response){location.href = 'home.html';}
 
 
     document.getElementById("item1").value = "";
@@ -32,7 +32,10 @@ async function login(e) {
 
   } catch (error) {
     console.error("catch block called");    
-    console.error(error);    
+    console.log(error.message);    
+    error.message=="Request failed with status code 404"?document.getElementById('message').innerText="User Not Found":document.getElementById('message').innerText="Incorrect password";
+
+
     // document.getElementById('message').innerText=error;
     // document.getElementById('message').innerText=error.message;
 

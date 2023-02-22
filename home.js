@@ -14,7 +14,9 @@ async function showI(e) {
   try {
     e.preventDefault();
 
-    const response = await axios.get("http://localhost:3000/expense/expenses",{headers:{'Authorization':localStorage.getItem('token')}});
+    const response = await axios.get("http://localhost:3000/expense/expenses", {
+      headers: { Authorization: localStorage.getItem("token") },
+    });
     console.log(response.data);
     showOutput(response.data);
   } catch (error) {
@@ -67,14 +69,14 @@ async function addItem(e) {
       expense_amount: newItem1,
       description: newItem2,
       category: newItem3,
-      id:localStorage.getItem('token')
     };
 
     console.log(typeof data);
 
     const response = await axios.post(
       "http://localhost:3000/expense/addexpense",
-      data
+      data,
+      { headers: { Authorization: localStorage.getItem("token") } }
     );
     console.log(response);
     // location.reload();
@@ -92,7 +94,6 @@ async function addItem(e) {
     // li.appendChild(document.createTextNode(newItem3));
 
     li.innerHTML = ` ${newItem1} &nbsp &nbsp  ${newItem2} &nbsp &nbsp  ${newItem3}`;
-
 
     var sp = document.createElement("span");
     sp.style.display = "none";
@@ -134,11 +135,14 @@ async function removeItem(e) {
 
       const res = await axios.post(
         `http://localhost:3000/expense/deleteexpense`,
-        { id: k }
+        { id: k },
+        { headers: { Authorization: localStorage.getItem("token") } }
       );
       console.log(res);
 
-      itemList.removeChild(li);
+      if (res.data == 1) {
+        itemList.removeChild(li);
+      }
     }
   } catch (error) {
     console.error(error);
@@ -154,15 +158,15 @@ async function removeItem(e) {
 
       let k = JSON.parse(sp.innerHTML);
       console.log(k);
-      const resid=await axios.post(
+      const resid = await axios.post(
         `http://localhost:3000/expense/expensebyid`,
         { id: k }
       );
-      console.log(resid.data[0])
+      console.log(resid.data[0]);
 
-    document.getElementById("item1").value = resid.data[0].expense_amount;
-    document.getElementById("item2").value = resid.data[0].description;
-    document.getElementById("item3").value = resid.data[0].category;
+      document.getElementById("item1").value = resid.data[0].expense_amount;
+      document.getElementById("item2").value = resid.data[0].description;
+      document.getElementById("item3").value = resid.data[0].category;
 
       const res = await axios.post(
         `http://localhost:3000/expense/deleteexpense`,
@@ -175,8 +179,6 @@ async function removeItem(e) {
   } catch (error) {
     console.error(error);
   }
-
-  
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -192,6 +194,43 @@ function filterItems(e) {
         item.style.display = "none";
       }
     });
+  } catch (error) {
+    console.error(error);
+  }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+document.getElementById("buy-premium").onclick = buyPremium;
+
+async function buyPremium(e) {
+    // console.log('buy premium')
+  try {
+    const response = await axios.get("http://localhost:3000/purchase/premium", {
+      headers: { Authorization: localStorage.getItem("token") },
+    });
+    console.log(response.data);
+
+    var options = {
+      key: response.data.key_id,
+      order_id: response.data.order.id,
+      handler: async function (response) {
+        await axios.post(
+          "http://localhost:3000/purchase/updatetransaction",
+          {
+            order_id: options.order_id,
+            payment_id: response.razorpay_payment_id,
+          },
+          { headers: { Authorization: localStorage.getItem("token") } }
+        );
+        alert("you are a premium user");
+      },
+    };
+
+    const rzp1 = new Razorpay(options);
+    rzp1.open();
+    e.preventDefault();
+    rzp1.on('payment.failed',function(response){
+      console.log(45665)
+    })
   } catch (error) {
     console.error(error);
   }
