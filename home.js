@@ -2,10 +2,21 @@ var form = document.getElementById("addForm");
 var itemList = document.getElementById("items");
 var filter = document.getElementById("filter");
 var body = document.getElementsByTagName("body");
+var leaderboard = document.getElementById("premium-feature")
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 filter.addEventListener("keyup", filterItems);
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function parseJwt (token) {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+
+  return JSON.parse(jsonPayload);
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 window.addEventListener("load", showI);
@@ -27,7 +38,11 @@ async function showI(e) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function showOutput(res) {
   try {
-    localStorage.getItem('premium')?document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p>':'    <button id="buy-premium" class="btn btn-dark" style="width: 20rem;margin-bottom: 2rem;">Buy Premium</button>'
+    const payload = parseJwt(localStorage.getItem('token'))
+    console.log(payload)
+
+
+    payload.ispremium===true?document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p><button id="use-premium" class="btn btn-dark" onClick=showLeaderboard() style="width: 20rem;margin-bottom: 2rem;">Show Leaderboard</button>':document.getElementById('premium').innerHTML='<button id="buy-premium" class="btn btn-dark" onClick=buyPremium() style="width: 20rem;margin-bottom: 2rem;">Buy Premium</button>'
     for (i in res) {
       var sp = document.createElement("span");
       sp.style.display = "none";
@@ -200,10 +215,10 @@ function filterItems(e) {
   }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-document.getElementById("buy-premium").onclick = buyPremium;
+// document.getElementById("buy-premium").onclick = buyPremium;
 
 async function buyPremium(e) {
-    // console.log('buy premium')
+     console.log('buy premium')
   try {
     const response = await axios.get("http://localhost:3000/purchase/premium", {
       headers: { Authorization: localStorage.getItem("token") },
@@ -214,7 +229,7 @@ async function buyPremium(e) {
       key: response.data.key_id,
       order_id: response.data.order.id,
       handler: async function (response) {
-        await axios.post(
+      const result=  await axios.post(
           "http://localhost:3000/purchase/updatetransaction",
           {
             order_id: options.order_id,
@@ -224,6 +239,8 @@ async function buyPremium(e) {
         );
         alert("you are a premium user");
         document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p>'
+        console.log("/////////////////////////////////////",result.data)
+        localStorage.setItem("token",result.data.token)
 
       },
     };
@@ -234,6 +251,33 @@ async function buyPremium(e) {
     rzp1.on('payment.failed',function(response){
       console.log(45665)
     })
+  } catch (error) {
+    console.error(error);
+  }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+async function showLeaderboard() {
+  alert('Leaderboard under process')
+  try {
+
+    document.getElementById('leaderboard').style.display="block";
+
+    const response = await axios.get("http://localhost:3000/premium/showleaderboard", {
+      headers: { Authorization: localStorage.getItem("token") },
+    });
+     console.log("///////////////////////////////////////////////////",response.data);
+     console.log("///////////////////////////////////////////////////",response.data[1]);
+     const res = response.data[0];
+    for(i in res){
+      console.log("///////////////////////////////////////////////////",res[i]);
+
+      var li = document.createElement("li");
+      li.className = "list-group-item";
+      li.innerHTML = ` Name: ${res[i].name} &nbsp &nbsp Total_amount: ${res[i].total_amount}  `;
+
+      leaderboard.appendChild(li)
+
+    }
   } catch (error) {
     console.error(error);
   }
