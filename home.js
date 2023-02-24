@@ -238,7 +238,7 @@ async function buyPremium(e) {
           { headers: { Authorization: localStorage.getItem("token") } }
         );
         alert("you are a premium user");
-        document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p>'
+        document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p><button id="use-premium" class="btn btn-dark" onClick=showLeaderboard() style="width: 20rem;margin-bottom: 2rem;">Show Leaderboard</button>'
         console.log("/////////////////////////////////////",result.data)
         localStorage.setItem("token",result.data.token)
 
@@ -266,8 +266,8 @@ async function showLeaderboard() {
       headers: { Authorization: localStorage.getItem("token") },
     });
      console.log("///////////////////////////////////////////////////",response.data);
-     console.log("///////////////////////////////////////////////////",response.data[1]);
-     const res = response.data[0];
+     console.log("///////////////////////////////////////////////////",response);
+     const res = response.data;
     for(i in res){
       console.log("///////////////////////////////////////////////////",res[i]);
 
