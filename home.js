@@ -20,26 +20,88 @@ function parseJwt (token) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 window.addEventListener("load", showI);
+let current_page =1;
+let rows =1;
+localStorage.getItem('rows')?rows=localStorage.getItem('rows'):rows=1;
 
 async function showI(e) {
   try {
-    e.preventDefault();
+    localStorage.getItem('rows')?rows=localStorage.getItem('rows'):rows=1;
 
     const response = await axios.get("http://localhost:3000/expense/expenses", {
       headers: { Authorization: localStorage.getItem("token") },
     });
+
+    const pagination_element = document.getElementById('pagination');
+    slicedResponse(response.data,rows,current_page)
+    SetupPagination(response.data, pagination_element, rows);
     console.log(response.data);
-    showOutput(response.data);
   } catch (error) {
     console.error(error);
   }
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function slicedResponse (data,rows,current_page){
+  current_page--;
+  let start = rows*current_page;
+  let end = parseInt(start) + parseInt(rows);
+  console.log("/////////////////",start,"//////////////",end)
 
+  showOutput(data.slice(start,end));
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function SetupPagination (items, wrapper, rows_per_page) {
+	wrapper.innerHTML = "";
+  wrapper.innerHTML = ` <select id="no_of_rows" style="width: 1rem;" onChange=setRows()>
+  <option value=1>select</option>
+  <option value=1>1</option>
+  <option value=5>5</option>
+  <option value=10>10</option>
+  <option value=20>20</option>
+</select>`;
+
+	let page_count = Math.ceil(items.length / rows_per_page);
+	for (let i = 1; i < page_count + 1; i++) {
+		let btn = PaginationButton(i, items);
+		wrapper.appendChild(btn);
+	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function PaginationButton (page, items) {
+	let button = document.createElement('button');
+	button.innerText = page;
+
+	if (current_page == page) button.classList.add('active');
+
+	button.addEventListener('click', function () {
+		current_page = page;
+		slicedResponse(items, rows, current_page);
+
+		let current_btn = document.querySelector('.pagenumbers button.active');
+		current_btn.classList.remove('active');
+
+		button.classList.add('active');
+	});
+
+	return button;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function setRows(){
+  r=document.getElementById('no_of_rows').value;
+  console.log(r);
+  localStorage.setItem("rows",r)
+  showI()
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function showOutput(res) {
   try {
+    itemList.innerHTML=""
     const payload = parseJwt(localStorage.getItem('token'))
     console.log(payload)
+
 
 
     payload.ispremium===true?document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p><button id="use-premium" class="btn btn-dark" onClick=showLeaderboard() style="width: 20rem;margin-bottom: 2rem;">Show Leaderboard</button><button id="download-expense" class="btn btn-dark" onClick=downloadExpense() style="width: 20rem;margin-bottom: 2rem;">Download Expense</button>':document.getElementById('premium').innerHTML='<button id="buy-premium" class="btn btn-dark" onClick=buyPremium() style="width: 20rem;margin-bottom: 2rem;">Buy Premium</button>'
