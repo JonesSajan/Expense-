@@ -42,7 +42,7 @@ function showOutput(res) {
     console.log(payload)
 
 
-    payload.ispremium===true?document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p><button id="use-premium" class="btn btn-dark" onClick=showLeaderboard() style="width: 20rem;margin-bottom: 2rem;">Show Leaderboard</button>':document.getElementById('premium').innerHTML='<button id="buy-premium" class="btn btn-dark" onClick=buyPremium() style="width: 20rem;margin-bottom: 2rem;">Buy Premium</button>'
+    payload.ispremium===true?document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p><button id="use-premium" class="btn btn-dark" onClick=showLeaderboard() style="width: 20rem;margin-bottom: 2rem;">Show Leaderboard</button><button id="download-expense" class="btn btn-dark" onClick=downloadExpense() style="width: 20rem;margin-bottom: 2rem;">Download Expense</button>':document.getElementById('premium').innerHTML='<button id="buy-premium" class="btn btn-dark" onClick=buyPremium() style="width: 20rem;margin-bottom: 2rem;">Buy Premium</button>'
     for (i in res) {
       var sp = document.createElement("span");
       sp.style.display = "none";
@@ -238,7 +238,7 @@ async function buyPremium(e) {
           { headers: { Authorization: localStorage.getItem("token") } }
         );
         alert("you are a premium user");
-        document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p><button id="use-premium" class="btn btn-dark" onClick=showLeaderboard() style="width: 20rem;margin-bottom: 2rem;">Show Leaderboard</button>'
+        document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p><button id="use-premium" class="btn btn-dark" onClick=showLeaderboard() style="width: 20rem;margin-bottom: 2rem;">Show Leaderboard</button><button id="download-expense" class="btn btn-dark" onClick=downloadExpense() style="width: 20rem;margin-bottom: 2rem;">Download Expense</button>'
         console.log("/////////////////////////////////////",result.data)
         localStorage.setItem("token",result.data.token)
 
@@ -281,4 +281,18 @@ async function showLeaderboard() {
   } catch (error) {
     console.error(error);
   }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+async function downloadExpense(){
+  console.log("Download Expense Called")
+  
+  const response = await axios.get("http://localhost:3000/expense/download", {
+    headers: { Authorization: localStorage.getItem("token") },
+  });
+  console.log(response.data.fileUrl);
+  var a = document.createElement("a");
+  a.href=response.data.fileUrl;
+  a.download="myexpense.csv";
+  a.click();
+  console.log(response);
 }
