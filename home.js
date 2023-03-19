@@ -35,9 +35,9 @@ async function showI(e) {
     const pagination_element = document.getElementById('pagination');
     slicedResponse(response.data,rows,current_page)
     SetupPagination(response.data, pagination_element, rows);
-    console.log(response.data);
+    //console.log(response.data);
   } catch (error) {
-    console.error(error);
+    //console.error(error);
   }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,7 +45,6 @@ function slicedResponse (data,rows,current_page){
   current_page--;
   let start = rows*current_page;
   let end = parseInt(start) + parseInt(rows);
-  console.log("/////////////////",start,"//////////////",end)
 
   showOutput(data.slice(start,end));
 
@@ -91,7 +90,7 @@ function PaginationButton (page, items) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function setRows(){
   r=document.getElementById('no_of_rows').value;
-  console.log(r);
+  //console.log(r);
   localStorage.setItem("rows",r)
   current_page=1;
   showI()
@@ -101,15 +100,16 @@ function showOutput(res) {
   try {
     itemList.innerHTML=""
     const payload = parseJwt(localStorage.getItem('token'))
-    console.log(payload)
+    //console.log(payload)
 
 
 
-    payload.ispremium===true?document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p><button id="use-premium" class="btn btn-dark" onClick=showLeaderboard() style="width: 20rem;margin-bottom: 2rem;">Show Leaderboard</button><button id="download-expense" class="btn btn-dark" onClick=downloadExpense() style="width: 20rem;margin-bottom: 2rem;">Download Expense</button>':document.getElementById('premium').innerHTML='<button id="buy-premium" class="btn btn-dark" onClick=buyPremium() style="width: 20rem;margin-bottom: 2rem;">Buy Premium</button>'
+    payload.ispremium===true?document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p><button id="use-premium" class="btn btn-dark" onClick=showLeaderboard() style="width: 20rem;margin-bottom: 2rem;">Show Leaderboard</button>':document.getElementById('premium').innerHTML='<button id="buy-premium" class="btn btn-dark" onClick=buyPremium() style="width: 20rem;margin-bottom: 2rem;">Buy Premium</button>'
+    // payload.ispremium===true?document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p><button id="use-premium" class="btn btn-dark" onClick=showLeaderboard() style="width: 20rem;margin-bottom: 2rem;">Show Leaderboard</button><button id="download-expense" class="btn btn-dark" onClick=downloadExpense() style="width: 20rem;margin-bottom: 2rem;">Download Expense</button>':document.getElementById('premium').innerHTML='<button id="buy-premium" class="btn btn-dark" onClick=buyPremium() style="width: 20rem;margin-bottom: 2rem;">Buy Premium</button>'
     for (i in res) {
       var sp = document.createElement("span");
       sp.style.display = "none";
-      sp.innerText = JSON.stringify(res[i].id);
+      sp.innerText = JSON.stringify(res[i]._id);
 
       var li = document.createElement("li");
 
@@ -130,7 +130,7 @@ function showOutput(res) {
       itemList.appendChild(li);
     }
   } catch (error) {
-    console.error(error);
+    //console.error(error);
   }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,14 +150,14 @@ async function addItem(e) {
       category: newItem3,
     };
 
-    console.log(typeof data);
+    //console.log(typeof data);
 
     const response = await axios.post(
       "http://localhost:3000/expense/addexpense",
       data,
       { headers: { Authorization: localStorage.getItem("token") } }
     );
-    console.log(response);
+    //console.log(response);
     // location.reload();
     document.getElementById("item1").value = "";
     document.getElementById("item2").value = "";
@@ -181,7 +181,7 @@ async function addItem(e) {
     var deleteBtn = document.createElement("button");
     deleteBtn.className = "btn btn-danger btn-sm float-right delete";
     deleteBtn.appendChild(document.createTextNode("Delete"));
-    // console.log(response.data.id);
+    // //console.log(response.data.id);
 
     var editBtn = document.createElement("button");
     editBtn.className = "btn btn-danger btn-sm float-right edit";
@@ -193,7 +193,7 @@ async function addItem(e) {
 
     itemList.appendChild(li);
   } catch (error) {
-    console.error(error);
+    //console.error(error);
   }
 }
 
@@ -206,25 +206,25 @@ async function removeItem(e) {
       var li = e.target.parentElement;
       var sp = e.target.nextSibling;
 
-      console.log(1);
-      console.log(sp.innerHTML);
+      //console.log(sp.innerHTML);
 
       let k = JSON.parse(sp.innerHTML);
-      console.log(k);
+      //console.log(k);
 
       const res = await axios.post(
         `http://localhost:3000/expense/deleteexpense`,
         { id: k },
         { headers: { Authorization: localStorage.getItem("token") } }
       );
-      console.log(res);
+      //console.log(res,"//////////////////////////////////////");
+      //console.log(res.data.deletedCount)
 
-      if (res.data == 1) {
+      if (res.data.deletedCount == 1) {
         itemList.removeChild(li);
       }
     }
   } catch (error) {
-    console.error(error);
+    //console.error(error);
   }
 
   try {
@@ -232,31 +232,32 @@ async function removeItem(e) {
       var li = e.target.parentElement;
       var sp = e.target.previousSibling;
 
-      console.log("edit called");
-      console.log(sp.innerHTML);
+      //console.log("edit called");
+      //console.log(sp.innerHTML);
 
       let k = JSON.parse(sp.innerHTML);
-      console.log(k);
+      //console.log(k);
       const resid = await axios.post(
         `http://localhost:3000/expense/expensebyid`,
         { id: k }
       );
-      console.log(resid.data[0]);
+      //console.log(resid);
 
-      document.getElementById("item1").value = resid.data[0].expense_amount;
-      document.getElementById("item2").value = resid.data[0].description;
-      document.getElementById("item3").value = resid.data[0].category;
+      document.getElementById("item1").value = resid.data.expense_amount;
+      document.getElementById("item2").value = resid.data.description;
+      document.getElementById("item3").value = resid.data.category;
 
       const res = await axios.post(
         `http://localhost:3000/expense/deleteexpense`,
-        { id: k }
+        { id: k },
+        { headers: { Authorization: localStorage.getItem("token") } }
       );
-      console.log(res);
+      //console.log(res);
 
       itemList.removeChild(li);
     }
   } catch (error) {
-    console.error(error);
+    //console.error(error);
   }
 }
 
@@ -274,19 +275,19 @@ function filterItems(e) {
       }
     });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
   }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // document.getElementById("buy-premium").onclick = buyPremium;
 
 async function buyPremium(e) {
-     console.log('buy premium')
+     //console.log('buy premium')
   try {
     const response = await axios.get("http://localhost:3000/purchase/premium", {
       headers: { Authorization: localStorage.getItem("token") },
     });
-    console.log(response.data);
+    //console.log(response.data);
 
     var options = {
       key: response.data.key_id,
@@ -302,7 +303,7 @@ async function buyPremium(e) {
         );
         alert("you are a premium user");
         document.getElementById('premium').innerHTML='<p style="color:green">You Are A Premium User</p><button id="use-premium" class="btn btn-dark" onClick=showLeaderboard() style="width: 20rem;margin-bottom: 2rem;">Show Leaderboard</button><button id="download-expense" class="btn btn-dark" onClick=downloadExpense() style="width: 20rem;margin-bottom: 2rem;">Download Expense</button>'
-        console.log("/////////////////////////////////////",result.data)
+        //console.log("/////////////////////////////////////",result.data)
         localStorage.setItem("token",result.data.token)
 
       },
@@ -312,10 +313,10 @@ async function buyPremium(e) {
     rzp1.open();
     e.preventDefault();
     rzp1.on('payment.failed',function(response){
-      console.log(45665)
+      //console.log(45665)
     })
   } catch (error) {
-    console.error(error);
+    //console.error(error);
   }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -328,11 +329,11 @@ async function showLeaderboard() {
     const response = await axios.get("http://localhost:3000/premium/showleaderboard", {
       headers: { Authorization: localStorage.getItem("token") },
     });
-     console.log("///////////////////////////////////////////////////",response.data);
-     console.log("///////////////////////////////////////////////////",response);
+     //console.log("///////////////////////////////////////////////////",response.data);
+     //console.log("///////////////////////////////////////////////////",response);
      const res = response.data;
     for(i in res){
-      console.log("///////////////////////////////////////////////////",res[i]);
+      //console.log("///////////////////////////////////////////////////",res[i]);
 
       var li = document.createElement("li");
       li.className = "list-group-item";
@@ -342,20 +343,20 @@ async function showLeaderboard() {
 
     }
   } catch (error) {
-    console.error(error);
+    //console.error(error);
   }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function downloadExpense(){
-  console.log("Download Expense Called")
+  //console.log("Download Expense Called")
   
   const response = await axios.get("http://localhost:3000/expense/download", {
     headers: { Authorization: localStorage.getItem("token") },
   });
-  console.log(response.data.fileUrl);
+  //console.log(response.data.fileUrl);
   var a = document.createElement("a");
   a.href=response.data.fileUrl;
   a.download="myexpense.csv";
   a.click();
-  console.log(response);
+  //console.log(response);
 }

@@ -16,6 +16,12 @@ async function forgotPassword(e) {
       data
     );
     console.log(response);
+    if(response.data){
+      document.getElementById('message').innerHTML='<p style="color:green">Please Check Your Mail</p>'
+      form.style.display="none";
+    
+  }
+
 
 
  
